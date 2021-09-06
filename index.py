@@ -1,48 +1,36 @@
 from typing import Callable
 import discord
-from  tribes import TribesMasterClient
+from  tribes import  discord_get_serverinfo
 import logging
 
-#e.g. AAAAAAAAAAAAAAAAAAAAAAAA.AAAAAA.AAAAAAAAAAAAAAAAAAAAAA_AAAA
-DISCORD_TOKEN = ""
+############# CONFIG START ####################
 
-#respond to all channels in here
+#e.g. AAAAAAAAAAAAAAAAAAAAAAAA.AAAAAA.AAAAAAAAAAAAAAAAAAAAAA_AAAA
+DISCORD_AUTH_TOKEN = "ADD_AUTH_TOKEN"
+
 discord_observed_channels = {
+    #respond to all channels in here
     "880469577639788694":True,
     "880469511814398025":True,
+    "ADD_CHANNEL_HERE":True
 }
 
-_debug_log = logging.getLogger(__name__)
-
-async def discord_get_serverinfo(ip, port):
-    global _debug_log
-    tribes_srv = None
-    try:
-        tribes_srv = TribesMasterClient(ip, port)
-        try:
-            await tribes_srv.Query(readplayerdata=True)
-        except:
-            tribes_srv.logger.exception()
-    except:
-        _debug_log.exception("%s %s" % (ip, port))
-    return tribes_srv
-
 discord_commands = {
-        #"chat_cmd":(function, ip, port, color in rgb)
+        #"chat_cmd":        (function,               ip, port, color in rgb)
         "!lt":(discord_get_serverinfo, "207.148.13.132", 28006, 0xa00264),
         "!pu":(discord_get_serverinfo, "207.148.13.132", 28001, 0x737ecd)
 }
+############# CONFIG END ####################
 
 client = discord.Client()
 
 @client.event
 async def on_ready():
-    global   _debug_log
-    _debug_log.info('Logged in as {0.user}'.format(client))
+    logging.info('Logged in as {0.user}'.format(client))
 
 @client.event
 async def on_message(message):
-    global discord_observed_channels, discord_commands, _debug_log
+    global discord_observed_channels, discord_commands
     if message.author == client.user:
         return
 
@@ -75,6 +63,7 @@ async def on_message(message):
                 #embedVar.set_footer(name="footer")
                 await message.channel.send(embed=embedVar)
         except:
-            _debug_log.exception(msg_content)
+            logging.exception(msg_content)
 
-client.run(DISCORD_TOKEN)
+logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO)
+client.run(DISCORD_AUTH_TOKEN)

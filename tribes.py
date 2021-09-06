@@ -200,3 +200,15 @@ class TribesMasterClient:
 
         except:
             self.logger.exception()
+
+async def discord_get_serverinfo(ip, port):
+    tribes_srv = None
+    try:
+        tribes_srv = TribesMasterClient(ip, port)
+        try:
+            await tribes_srv.Query(readplayerdata=True)
+        except:
+            tribes_srv.logger.exception("inner")
+    except:
+        logging.exception("%s %s" % (ip, port))
+    return tribes_srv
